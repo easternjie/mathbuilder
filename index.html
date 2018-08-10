@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>小学数学试题生成器</title>
+    <link rel="shortcut icon" href="resources/img/logo.png" />
+    <link rel="stylesheet" type="text/css" href="resources/bootstrap-3.3.7/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="resources/font-awesome-4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="resources/BeAlert/css/BeAlert.css" />
+    <link rel="stylesheet" href="resources/css/index.css"/>
+    <script type="text/javascript" src="http://www.xdocin.com/xdoc.js"></script>
+    <script type="text/javascript" src="http://www.xdocin.com/baiduTemplate.js"></script>
+    <script type="text/javascript" src="resources/localForage-1.7.1/dist/localforage.js"></script>
+    <script type="text/javascript" src="resources/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="resources/jquery/jquery.custom.util.extend.js"></script>
+    <script type="text/javascript" src="resources/jquery/jquery.countdown-2.2.0/jquery.countdown.js"></script>
+    <script type="text/javascript" src="resources/jquery/jquery-validation-1.14.0/dist/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="resources/jquery/jquery-validation-1.14.0/dist/localization/messages_zh.min.js"></script>
+    <script type="text/javascript" src="resources/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="resources/BeAlert/js/BeAlert.js"></script>
+    <script src="resources/js/index.js"></script>
+    <!--<style>
+        .head{
+            font-size: 28px;
+            display: block;
+        }
+        .content{
+            display: block;
+        }
+    </style>-->
+</head>
+<body>
+<!--<input type="button" onclick="gen('pdf')" value="生成PDF"/>
+<input type="button" onclick="gen('docx')" value="生成Word"/>
+<br/>
+<script id="tmpl" type="text/html">
+    <xdoc version="A.3.0">
+        <body>
+        <para heading="1" lineSpacing="28">
+            <text class="head" valign="center" fontName="标宋" fontSize="29"><%=title%></text>
+        </para>
+        <para>
+            <img  src="<%=img%>" sizeType="autosize"/>
+        </para>
+        <para lineSpacing="9">
+            <text class="content" fontName="仿宋" fontSize="18"><%=content%></text>
+        </para>
+        </body>
+    </xdoc>
+</script>
+<script type="text/javascript">
+    var type="docx";//pdf
+    var data = {
+        title: "导出"+type+"文件",
+        img: "http://www.wordlm.com/uploads/allimg/130101/1_130101000405_1.jpg",
+        content: "我这样就可以导出"+type+"格式的文件了，是不是很方便",
+    };
+    function renderTemplate(){
+        var template=$("#tmpl").html();
+        var html=template.replace(/<%=title%>/,data.title)
+            .replace(/<%=img%>/,data.img)
+            .replace(/<%=content%>/,data.content);
+        $("body").append(html);
+    }
+    renderTemplate();
+    function gen(type) {
+        XDoc.to(baidu.template('tmpl', data), type, {}, "_blank");
+    }
+</script>
+-->
+<!--头部设置区-->
+<header>
+    <h1>小学数学试题生成器</h1>
+    <h4>过程中请勿刷新或关闭页面，否则将无法续考</h4>
+    <form id="testTimeForm" style="display: inline-block;">
+        <p>
+            <label for="setTestTime">是否设定考试时间：</label>
+            <input type="checkbox" id="setTestTime" name="setTestTime" value="1" />
+            <span id="testTimeSpan">考试时间：
+                <input type="number" id="testTime" name="testTime" value="15"
+                       digits=true min="1" max="60" axlength="10" data-toggle="popover" data-placement="right" data-content=""/>分
+            </span>
+        </p>
+    </form>
+    <p>
+        点此生成试卷：<span id="gen" class="btn_common btn_unchecked">生成</span>；
+    </p>
+    <p>点此下载试卷(必须先生成)：<span id="download" class="btn_disable btn_unchecked">下载</span>；</p>
+    <span id="advancedSettingsBtn">高级设置<span><i class="fa fa-angle-down"></i></span></span>
+    <form id="advancedSettingsForm">
+        <p>一、练习大题数目：
+            <input type="number" id="partNum" name="partNum" value=""
+                   required digits=true maxlength="10" min="1" max="5" data-toggle="popover" data-placement="right" data-content=""/>；
+        </p>
+        <div>
+            <p>二、练习大题设置，请逐个选择并设置指定大题的配置：
+                <select id="partSelect" name="partSelect" >
+                    <option value="">请选择</option>
+                </select>
+            </p>
+            <div id="partDetailDiv" data-partId="">
+                <p>1）大题名称：
+                    <input type="text" id="partName" name="partName" value=""
+                           required maxlength="10" data-toggle="popover" data-placement="right" data-content=""/>；
+                </p>
+                <p>2）大题所包含题目数量：
+                    <input type="number" id="partExercisesNum" name="partExercisesNum" value=""
+                           required digits=true maxlength="10" min="0" max="30" data-toggle="popover" data-placement="right" data-content=""/>；
+                </p>
+                <p>3）大题模板选择：
+                    <input type="radio" id="modal" name="partType" value="1" required/><label for="modal">自定义模板</label>
+                    <input type="radio" id="random" name="partType" value="2" /><label for="random">按规则随机</label>
+                    <input type="hidden" id="partTypeHidden"/>
+                    <span id="partTypeSpan" data-toggle="popover" data-placement="right" data-content="">&nbsp;</span>
+                </p>
+                <div class="partTypeDiv" id="modalDiv">
+                    <p>大题题型模板：
+                        <input type="text" id="partExercisesModel" name="partExercisesModel" value="" style="width: 500px;"
+                               required maxlength="20" data-toggle="popover" data-placement="right" data-content=""/>；
+                        <span class="mathFlag btn_common btn_unchecked" data-mathFlag="+">＋</span>&nbsp;
+                        <span class="mathFlag btn_common btn_unchecked" data-mathFlag="-">－</span>&nbsp;
+                        <span class="mathFlag btn_common btn_unchecked" data-mathFlag="*">&nbsp;×&nbsp;</span>&nbsp;
+                        <span class="mathFlag btn_common btn_unchecked" data-mathFlag="/">&nbsp;÷&nbsp;</span>&nbsp;
+                        <span class="mathFlag btn_common btn_unchecked" data-mathFlag="(">&nbsp;(&nbsp;</span>&nbsp;
+                        <span class="mathFlag btn_common btn_unchecked" data-mathFlag=")">&nbsp;)&nbsp;</span>&nbsp;
+                    </p>
+                    <p>Ps:配置格式如 {n[min,max]} (＋|－|×|÷)，其中[min,max]代表n生成的随机数范围，如 {n[1,10]}+{n[1,10]},题目中大括号及中括号全部使用小括号代替</p>
+                </div>
+                <div class="partTypeDiv" id="randomDiv">
+                    <p>a.运算结果范围：
+                        <input type="number" id="rangeMin" name="rangeMin" value=""
+                               required digits=true maxlength="10" min="1" max="10000" data-toggle="popover" data-placement="right" data-content=""/>
+                        - <input type="number" id="rangeMax" name="rangeMax" value=""
+                                 required digits=true maxlength="10" min="1" max="10000" data-toggle="popover" data-placement="right" data-content=""/>；
+                    </p>
+                    <p>b.是否随机增加括号运算：
+                        <input type="radio" id="contained" name="containsBrackets" value="1" required /><label for="contained">是</label>
+                        <input type="radio" id="uncontained" name="containsBrackets" value="0"/><label for="uncontained">否</label>
+                        <input type="hidden" id="containsBracketsHidden"/>
+                        <span id="containsBracketsSpan" data-toggle="popover" data-placement="right" data-content="">&nbsp;</span>
+                    </p>
+                    <p>c.四则运算选择：
+                        <input type="checkbox" id="add" name="mathFlag" value="1" required minlength="1"/><label class="mathFlag" for="add">＋</label>
+                        &nbsp;&nbsp;
+                        <input type="checkbox" id="subtract" name="mathFlag" value="2" /><label class="mathFlag" for="subtract">－</label>
+                        &nbsp;&nbsp;
+                        <input type="checkbox" id="multiply" name="mathFlag" value="3"/><label class="mathFlag" for="multiply">&nbsp;×&nbsp;</label>
+                        &nbsp;&nbsp;
+                        <input type="checkbox" id="divide" name="mathFlag" value="4"/><label class="mathFlag" for="divide">&nbsp;÷&nbsp;</label>
+                        <input type="hidden" id="mathFlagHidden"/>
+                        <span id="mathFlagSpan" data-toggle="popover" data-placement="right" data-content="">&nbsp;</span>
+                    </p>
+                    <p>d.变量个数
+                        <input type="number" id="randomValNum" name="randomValNum" value=""
+                               required digits=true maxlength="10" min="1" max="5" data-toggle="popover" data-placement="right" data-content=""/>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <span id="saveSettings" class="btn_common btn_unchecked">保存</span>&nbsp;&nbsp;&nbsp;&nbsp;
+        <span id="resetSettings" class="btn_common btn_unchecked">重置</span>
+        <p class="setting-explain">Ps:设置修改后即时对下一次试卷生成生效，但关闭页面后不生效；若想关闭后复用当前设置，则点击保存</p>
+    </form>
+</header>
+<!--倒计时区域，包含开始做题按钮-->
+<div id="countDownDiv">
+    <p>
+        <span id="startTest" class="btn_disable btn_unchecked">开始答题</span>
+        <span id="pauseTest" class="btn_common btn_unchecked">暂停</span>
+        <span id="resumeTest" class="btn_common btn_unchecked">继续</span>
+    </p>
+    <p>在线完成后可：<span id="submit" class="btn_disable btn_unchecked">交卷</span>以查看考试结果；
+        或在考试开始后<span id="testTimeSpan2">15</span>分钟可<span id="showAnswer" class="btn_disable btn_unchecked">查看答案</span>。</p>
+    <div id="countDown"></div>
+</div>
+<!--试卷区-->
+<div class="test-paper-div">
+    <span id="testResult">共N题，答对M题，答错M题，正确率A%</span>
+    <h2>练习试卷</h2>
+    <h3>1.第一大题</h3>
+    <p>
+        <span class="exersice">
+            （1）&nbsp;3&nbsp;×&nbsp;5&nbsp;=&nbsp;<input type="text"/>;
+            <span class="answer">&nbsp;<i class="fa fa-check-circle"></i><i class="fa fa-times-circle"></i>&nbsp;答案：<span class="answerValue">15</span></span>
+        </span>
+        <span class="exersice">
+            （2）&nbsp;30&nbsp;×&nbsp;50&nbsp;=&nbsp;<input type="text"/>;
+            <span class="answer">&nbsp;<i class="fa fa-check-circle"></i><i class="fa fa-times-circle"></i>&nbsp;答案：<span class="answerValue">1500</span></span>
+        </span>
+    </p>
+    <p>
+        <span class="exersice">
+            （3）&nbsp;3&nbsp;×&nbsp;5&nbsp;=&nbsp;<input type="text"/>;
+            <span class="answer">&nbsp;<i class="fa fa-check-circle"></i><i class="fa fa-times-circle"></i>&nbsp;答案：<span class="answerValue">15</span></span>
+        </span>
+        <span class="exersice">
+            （4）&nbsp;30&nbsp;×&nbsp;50&nbsp;=&nbsp;<input type="text"/>;
+            <span class="answer">&nbsp;<i class="fa fa-check-circle"></i><i class="fa fa-times-circle"></i>&nbsp;答案：<span class="answerValue">1500</span></span>
+        </span>
+    </p>
+</div>
+<!-- word模板生成区域 -->
+<script id="docScript" type="text/html">
+    <xdoc version="A.3.0">
+        <body>
+            <para heading="1" lineSpacing="28" align="center">
+                <text fontName="标宋" fontSize="29"><%=title%></text>
+            </para>
+            <!-- 判断语句if else-->
+            <%if(list.length>0) { %>
+                <%for(var i=0;i<list.length;i++){%>
+                    <para heading="1" lineSpacing="28">
+                        <text fontName="标宋" fontSize="23"><%=(i+1)%>.<%=list[i].partName%></text>
+                    </para>
+                    <%for(var j=0;j<list[i].partExercises.length;j++){%>
+                        <%if(j%2==0) { %>
+                            <para lineSpacing="9">
+                                <text fontName="仿宋" fontSize="18">（<%=j+1%>）<%=list[i].partExercises[j]%></text>
+                                <%if(j==list[i].partExercises.length-1) { %>
+                                    </para>
+                                <%}%>
+                        <%}else{%>
+                                <text fontName="仿宋" fontSize="18">     （<%=j+1%>）<%=list[i].partExercises[j]%></text>
+                            </para>
+                        <%}%>
+                    <%}%>
+                <%}%>
+            <%}else{%>
+            <para lineSpacing="9">
+                <text fontName="仿宋" fontSize="18"><%=noDataTip%></text>
+            </para>
+            <%}%>
+        </body>
+    </xdoc>
+</script>
+<!--暂停显示区-->
+<div class="pauseDiv">
+    <p>暂停中</p>
+</div>
+<!--loadding区 -->
+<div class="loading">
+    <p>试题生成中,请稍候<i class="fa fa-spin fa-spinner"></i></p>
+</div>
+<!--底部版权区-->
+<footer>
+    <p>@2018&nbsp;jiehexia.com&nbsp;版权所有&nbsp;,侵权必究&nbsp;&nbsp;杰和霞工作室 &nbsp;提供技术支持</p>
+    <p>渝ICP备17015180号-2&nbsp;
+        <img src="./resources/img/police_icon.png">
+        <a href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=50010302001874" target="_blank">
+            渝公网安备&nbsp;:&nbsp;50010302001874号
+        </a>
+    </p>
+</footer>
+</body>
+</html>
